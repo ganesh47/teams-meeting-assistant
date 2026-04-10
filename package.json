@@ -26,6 +26,6 @@
     "@cyclonedx/cyclonedx-npm": "^4.0.3",
     "@types/node": "^24.6.0",
     "playwright": "^1.55.1",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.2"
   }
 }
