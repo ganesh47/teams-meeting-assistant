@@ -66,10 +66,18 @@ Current project baseline includes:
 sudo apt update && sudo apt install -y git curl ca-certificates python3 python3-pip sox pulseaudio-utils ffmpeg && curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - && sudo apt install -y nodejs && git clone https://github.com/ganesh47/teams-meeting-assistant.git && cd teams-meeting-assistant && npm ci && npx playwright install --with-deps chromium && pip3 install faster-whisper && npm run build
 ```
 
+### Slicker terminal UX
+
+```bash
+node dist/cli.js
+```
+
+That opens the lightweight TUI menu.
+
 ### Quick start
 
 ```bash
-TEAMS_HEADLESS=1 node dist/cli.js linux-cli "https://teams.microsoft.com/l/meetup-join/..."
+TEAMS_HEADLESS=1 teams-meeting-assistant linux-cli "https://teams.microsoft.com/l/meetup-join/..."
 ```
 
 ### Offline transcript pipeline demo
@@ -85,17 +93,18 @@ Environment controls are documented in `.env.example`.
 ### Update check
 
 ```bash
-node dist/cli.js update
+teams-meeting-assistant update
 ```
 
 Apply update:
 
 ```bash
-node dist/cli.js update --apply
+teams-meeting-assistant update --apply
 ```
 
 Additional notes:
 - `docs/install.md` covers the simplified Linux VM install path
+- `docs/tui.md` covers the terminal menu UX
 - `docs/m1-prototype.md` covers the current browser-automation prototype
 - `docs/transcription-backends.md` covers the local transcription backend direction
 - `docs/end-to-end-status.md` states exactly what is and is not complete end-to-end

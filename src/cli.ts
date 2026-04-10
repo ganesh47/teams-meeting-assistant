@@ -2,16 +2,17 @@
 import { createAudioOptionsFromEnv, createRuntimeOptionsFromEnv } from './config.js';
 import { runLinuxCliJoinAndTranscript, runLocalTranscriptionPipeline, checkForUpdates, performUpdate } from './index.js';
 import { SessionOrchestrator } from './index.js';
+import { runTui } from './tui.js';
 import { FasterWhisperBackend } from './transcription/fasterWhisperRunner.js';
 import { MockTranscriptionBackend } from './transcription/mockTranscriptionBackend.js';
 
 async function main() {
   const args = process.argv.slice(2);
-  const command = args[0];
+  const command = args[0] ?? 'tui';
 
-  if (!command) {
-    console.error('Usage: teams-meeting-assistant <linux-cli|join|offline-pipeline|update> ...');
-    process.exit(1);
+  if (command === 'tui') {
+    await runTui();
+    return;
   }
 
   const orchestrator = new SessionOrchestrator();

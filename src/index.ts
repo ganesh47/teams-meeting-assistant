@@ -7,5 +7,6 @@ export { createMeetingTarget, parseTeamsJoinUrl } from './teams/joinUrl.js';
 export { classifyMeetingState, detectMeetingState } from './teams/meetingStateDetector.js';
 export { FasterWhisperBackend } from './transcription/fasterWhisperRunner.js';
 export { MockTranscriptionBackend } from './transcription/mockTranscriptionBackend.js';
+export { runTui } from './tui.js';
 export { checkForUpdates, performUpdate } from './update.js';
 export * from './types/index.js';
