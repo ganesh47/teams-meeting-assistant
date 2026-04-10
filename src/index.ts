@@ -1,4 +1,5 @@
 export { createAudioOptionsFromEnv, createRuntimeOptionsFromEnv } from './config.js';
+export { runLinuxCliJoinAndTranscript } from './core/linuxCliRunner.js';
 export { runLocalTranscriptionPipeline } from './core/pipelineRunner.js';
 export { SessionOrchestrator } from './core/sessionOrchestrator.js';
 export { BrowserTeamsJoinController } from './teams/teamsJoinFlow.js';

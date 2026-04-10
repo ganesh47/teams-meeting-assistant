@@ -35,6 +35,7 @@ This validates the local chunking, transcription backend interface, and transcri
 
 This repository now has an end-to-end *prototype path* for:
 - browser join automation
+- Linux CLI entrypoint
 - local transcript pipeline plumbing
 - transcript persistence
 

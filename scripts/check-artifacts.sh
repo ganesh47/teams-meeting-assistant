@@ -6,6 +6,7 @@ test -f docs/spec.md
 test -f docs/architecture.md
 test -f docs/end-to-end-status.md
 test -f docs/transcription-backends.md
+test -f docs/linux-cli.md
 test -f SECURITY.md
 test -f CONTRIBUTING.md
 test -f tsconfig.json

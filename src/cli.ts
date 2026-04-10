@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { createAudioOptionsFromEnv, createRuntimeOptionsFromEnv } from './config.js';
-import { runLocalTranscriptionPipeline } from './core/pipelineRunner.js';
+import { runLinuxCliJoinAndTranscript, runLocalTranscriptionPipeline } from './index.js';
 import { SessionOrchestrator } from './index.js';
 import { FasterWhisperBackend } from './transcription/fasterWhisperRunner.js';
 import { MockTranscriptionBackend } from './transcription/mockTranscriptionBackend.js';
@@ -15,6 +15,26 @@ async function main() {
   }
 
   const orchestrator = new SessionOrchestrator();
+
+  if (command === 'linux-cli') {
+    const joinUrl = args[1];
+    if (!joinUrl) {
+      console.error('Usage: teams-meeting-assistant linux-cli <teams-join-url>');
+      process.exit(1);
+    }
+
+    const output = await runLinuxCliJoinAndTranscript(joinUrl, {
+      useMockBackend: process.env.TEAMS_USE_MOCK_BACKEND === '1',
+    });
+    console.log(JSON.stringify({
+      sessionId: output.session.id,
+      state: output.snapshot.state,
+      transcriptText: output.session.artifacts.transcriptText,
+      chunksProcessed: output.result.chunksProcessed,
+      segmentsWritten: output.result.segmentsWritten,
+    }, null, 2));
+    return;
+  }
 
   if (command === 'join') {
     const joinUrl = args[1];

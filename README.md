@@ -65,7 +65,7 @@ npm install
 npx playwright install chromium
 npm run build
 npm test
-TEAMS_HEADLESS=1 node dist/cli.js join "https://teams.microsoft.com/l/meetup-join/..." --auto-join
+TEAMS_HEADLESS=1 node dist/cli.js linux-cli "https://teams.microsoft.com/l/meetup-join/..."
 ```
 
 ### Offline transcript pipeline demo
@@ -82,3 +82,4 @@ Additional notes:
 - `docs/m1-prototype.md` covers the current browser-automation prototype
 - `docs/transcription-backends.md` covers the local transcription backend direction
 - `docs/end-to-end-status.md` states exactly what is and is not complete end-to-end
+- `docs/linux-cli.md` covers the Linux CLI target flow
