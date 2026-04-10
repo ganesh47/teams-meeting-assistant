@@ -1,0 +1,19 @@
+name: Task
+description: Track a scoped implementation task
+labels:
+  - task
+body:
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objective
+    validations:
+      required: true
+  - type: textarea
+    id: deliverables
+    attributes:
+      label: Deliverables
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria

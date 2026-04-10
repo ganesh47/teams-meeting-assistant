@@ -1,0 +1,36 @@
+- name: enhancement
+  color: a2eeef
+  description: New capability or improvement
+- name: bug
+  color: d73a4a
+  description: Something is broken
+- name: task
+  color: 0e8a16
+  description: Scoped implementation task
+- name: spec
+  color: 5319e7
+  description: Specification, architecture, or design work
+- name: infra
+  color: 1d76db
+  description: Repository, CI, or infrastructure work
+- name: audio
+  color: fbca04
+  description: Audio capture or processing
+- name: transcription
+  color: c2e0c6
+  description: Speech-to-text pipeline work
+- name: teams
+  color: 0052cc
+  description: Teams join and meeting behavior
+- name: ux
+  color: f9d0c4
+  description: Product UX or interface work
+- name: reliability
+  color: bfd4f2
+  description: Stability, reconnects, and failure handling
+- name: security
+  color: b60205
+  description: Security, privacy, or compliance
+- name: docs
+  color: 0075ca
+  description: Documentation work
