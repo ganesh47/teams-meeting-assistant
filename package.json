@@ -7,6 +7,9 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "teams-meeting-assistant": "dist/cli.js"
+  },
   "files": [
     "dist"
   ],
@@ -20,6 +23,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.6.0",
+    "playwright": "^1.55.1",
     "typescript": "^5.9.3"
   }
 }

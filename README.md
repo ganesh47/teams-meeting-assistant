@@ -13,6 +13,7 @@ A meeting assistant focused on Microsoft Teams meetings, with local-only transcr
 ## Planned Capabilities
 
 - Browser-based Teams join flow
+- Playwright-based persistent Chromium launch for M1 prototype
 - Guest and signed-in personal Microsoft account join support
 - Lobby detection and wait handling
 - Mute mic and disable camera by default
@@ -60,6 +61,10 @@ Current project baseline includes:
 
 ```bash
 npm install
+npx playwright install chromium
 npm run build
 npm test
+node dist/cli.js "https://teams.microsoft.com/l/meetup-join/..." --headless
 ```
+
+See `docs/m1-prototype.md` for the current browser-automation prototype notes.

@@ -22,6 +22,12 @@ export interface SessionArtifactPaths {
   logFile: string;
 }
 
+export interface SessionRuntimeOptions {
+  headless: boolean;
+  profileDir: string;
+  displayName: string;
+}
+
 export interface MeetingSession {
   id: string;
   target: MeetingTarget;
@@ -29,4 +35,5 @@ export interface MeetingSession {
   startedAt: string;
   updatedAt: string;
   artifacts: SessionArtifactPaths;
+  runtime: SessionRuntimeOptions;
 }
