@@ -1,0 +1,14 @@
+{
+  "name": "teams-meeting-assistant",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Microsoft Teams meeting assistant with local-only transcription.",
+  "license": "MIT",
+  "scripts": {
+    "lint": "echo 'No code lint configured yet'",
+    "test": "echo 'No tests configured yet'"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check markdown files exist
+        run: |
+          test -f README.md
+          test -f docs/spec.md
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    if: ${{ hashFiles('scripts/*.sh') != '' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run ShellCheck
+        uses: ludeeus/action-shellcheck@2.0.0
+
+  yaml-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate workflow YAML
+        run: |
+          python - <<'PY'
+          import pathlib, sys, yaml
+          for path in pathlib.Path('.github/workflows').glob('*.yml'):
+              with open(path, 'r', encoding='utf-8') as f:
+                  yaml.safe_load(f)
+          print('workflow yaml ok')
+          PY
+
+      - name: Install PyYAML
+        run: python -m pip install pyyaml
