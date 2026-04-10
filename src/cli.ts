@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { createAudioOptionsFromEnv, createRuntimeOptionsFromEnv } from './config.js';
-import { runLinuxCliJoinAndTranscript, runLocalTranscriptionPipeline } from './index.js';
+import { runLinuxCliJoinAndTranscript, runLocalTranscriptionPipeline, checkForUpdates, performUpdate } from './index.js';
 import { SessionOrchestrator } from './index.js';
 import { FasterWhisperBackend } from './transcription/fasterWhisperRunner.js';
 import { MockTranscriptionBackend } from './transcription/mockTranscriptionBackend.js';
@@ -10,11 +10,41 @@ async function main() {
   const command = args[0];
 
   if (!command) {
-    console.error('Usage: teams-meeting-assistant <join|offline-pipeline> ...');
+    console.error('Usage: teams-meeting-assistant <linux-cli|join|offline-pipeline|update> ...');
     process.exit(1);
   }
 
   const orchestrator = new SessionOrchestrator();
+
+  if (command === 'update') {
+    const shouldApply = args.includes('--apply');
+    const status = await checkForUpdates();
+
+    if (!status.latestVersion) {
+      console.log(JSON.stringify({ ok: false, message: 'Could not determine latest version from npm.' }, null, 2));
+      return;
+    }
+
+    if (!status.updateAvailable) {
+      console.log(JSON.stringify({ ok: true, message: 'Already up to date.', currentVersion: status.currentVersion }, null, 2));
+      return;
+    }
+
+    if (!shouldApply) {
+      console.log(JSON.stringify({
+        ok: true,
+        updateAvailable: true,
+        currentVersion: status.currentVersion,
+        latestVersion: status.latestVersion,
+        command: status.command,
+      }, null, 2));
+      return;
+    }
+
+    const result = await performUpdate();
+    console.log(JSON.stringify({ ok: true, updated: true, command: result.command }, null, 2));
+    return;
+  }
 
   if (command === 'linux-cli') {
     const joinUrl = args[1];

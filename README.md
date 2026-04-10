@@ -60,13 +60,15 @@ Current project baseline includes:
 - Linux CLI packaging and Docker build support
 - release automation, SBOM, and provenance scaffolding
 
+### One-liner install on Ubuntu/Debian VM
+
+```bash
+sudo apt update && sudo apt install -y git curl ca-certificates python3 python3-pip sox pulseaudio-utils ffmpeg && curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - && sudo apt install -y nodejs && git clone https://github.com/ganesh47/teams-meeting-assistant.git && cd teams-meeting-assistant && npm ci && npx playwright install --with-deps chromium && pip3 install faster-whisper && npm run build
+```
+
 ### Quick start
 
 ```bash
-npm install
-npx playwright install chromium
-npm run build
-npm test
 TEAMS_HEADLESS=1 node dist/cli.js linux-cli "https://teams.microsoft.com/l/meetup-join/..."
 ```
 
@@ -80,7 +82,20 @@ node dist/cli.js offline-pipeline mock
 
 Environment controls are documented in `.env.example`.
 
+### Update check
+
+```bash
+node dist/cli.js update
+```
+
+Apply update:
+
+```bash
+node dist/cli.js update --apply
+```
+
 Additional notes:
+- `docs/install.md` covers the simplified Linux VM install path
 - `docs/m1-prototype.md` covers the current browser-automation prototype
 - `docs/transcription-backends.md` covers the local transcription backend direction
 - `docs/end-to-end-status.md` states exactly what is and is not complete end-to-end
