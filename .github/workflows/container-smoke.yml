@@ -1,0 +1,18 @@
+name: Container Smoke
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build container
+        run: docker build -t teams-meeting-assistant:smoke .
+
+      - name: Smoke test CLI help
+        run: docker run --rm teams-meeting-assistant:smoke node dist/cli.js

@@ -1,14 +1,16 @@
-name: Build
+name: Release CLI
 
 on:
   push:
-    branches: [main]
-  pull_request:
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
-  build-and-test:
+  release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,17 +24,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Playwright browser
-        run: npx playwright install --with-deps chromium
-
       - name: Build
         run: npm run build
 
-      - name: Test
-        run: npm test
-
-      - name: Check repo artifacts
-        run: bash scripts/check-artifacts.sh
-
       - name: Pack CLI
         run: npm pack
+
+      - name: Upload package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cli-package
+          path: '*.tgz'
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: '*.tgz'
+          generate_release_notes: true

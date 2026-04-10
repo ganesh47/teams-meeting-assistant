@@ -53,10 +53,11 @@ Planning complete, repository scaffolded, and initial TypeScript implementation 
 Current project baseline includes:
 
 - TypeScript build setup
-- GitHub Actions for CI, build, security checks, CodeQL, release prep, and label sync
+- GitHub Actions for CI, build, security checks, CodeQL, release prep, release packaging, container smoke, and label sync
 - issue templates and PR template
 - architecture and ADR docs
 - implementation skeleton for core modules
+- Linux CLI packaging and Docker build support
 
 ### Quick start
 
@@ -83,3 +84,4 @@ Additional notes:
 - `docs/transcription-backends.md` covers the local transcription backend direction
 - `docs/end-to-end-status.md` states exactly what is and is not complete end-to-end
 - `docs/linux-cli.md` covers the Linux CLI target flow
+- `docs/devsecops.md` covers CI/CD and DevSecOps posture
