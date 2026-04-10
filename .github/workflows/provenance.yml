@@ -1,0 +1,40 @@
+name: Provenance
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  provenance:
+    permissions:
+      actions: read
+      contents: write
+      id-token: write
+    uses: slsa-framework/slsa-github-generator/.github/workflows/generator_generic_slsa3.yml@v2.1.0
+    with:
+      base64-subjects: ${{ needs.hash.outputs.hashes }}
+
+  hash:
+    runs-on: ubuntu-latest
+    outputs:
+      hashes: ${{ steps.hash.outputs.hashes }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build package
+        run: |
+          npm run build
+          npm pack
+      - id: hash
+        name: Generate subject hashes
+        run: |
+          HASHES=$(sha256sum *.tgz | base64 -w0)
+          echo "hashes=$HASHES" >> "$GITHUB_OUTPUT"

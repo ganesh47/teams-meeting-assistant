@@ -58,6 +58,7 @@ Current project baseline includes:
 - architecture and ADR docs
 - implementation skeleton for core modules
 - Linux CLI packaging and Docker build support
+- release automation, SBOM, and provenance scaffolding
 
 ### Quick start
 
@@ -85,3 +86,5 @@ Additional notes:
 - `docs/end-to-end-status.md` states exactly what is and is not complete end-to-end
 - `docs/linux-cli.md` covers the Linux CLI target flow
 - `docs/devsecops.md` covers CI/CD and DevSecOps posture
+- `docs/release.md` covers release automation and supply-chain posture
+- `docs/packaging.md` covers Linux CLI packaging extras

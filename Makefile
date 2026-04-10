@@ -15,3 +15,9 @@ smoke-linux-cli:
 
 docker-build:
 	docker build -t teams-meeting-assistant:local .
+
+sbom:
+	npm run sbom
+
+completion:
+	bash scripts/generate-completion.sh > teams-meeting-assistant.bash
