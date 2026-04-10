@@ -65,7 +65,15 @@ npm install
 npx playwright install chromium
 npm run build
 npm test
-TEAMS_HEADLESS=1 node dist/cli.js "https://teams.microsoft.com/l/meetup-join/..." --auto-join
+TEAMS_HEADLESS=1 node dist/cli.js join "https://teams.microsoft.com/l/meetup-join/..." --auto-join
+```
+
+### Offline transcript pipeline demo
+
+```bash
+TEAMS_AUDIO_FIXTURE_PATH=/path/to/sample.raw \
+TEAMS_AUDIO_MODE=system_loopback \
+node dist/cli.js offline-pipeline mock
 ```
 
 Environment controls are documented in `.env.example`.
@@ -73,3 +81,4 @@ Environment controls are documented in `.env.example`.
 Additional notes:
 - `docs/m1-prototype.md` covers the current browser-automation prototype
 - `docs/transcription-backends.md` covers the local transcription backend direction
+- `docs/end-to-end-status.md` states exactly what is and is not complete end-to-end

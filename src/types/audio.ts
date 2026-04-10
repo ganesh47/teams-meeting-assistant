@@ -15,3 +15,11 @@ export interface AudioCaptureHealth {
   healthy: boolean;
   detail: string;
 }
+
+export interface AudioCaptureOptions {
+  mode?: AudioCaptureMode;
+  fixturePath?: string;
+  sampleRateHz?: number;
+  channels?: number;
+  chunkDurationMs?: number;
+}

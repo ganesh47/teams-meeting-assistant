@@ -1,16 +1,13 @@
 import { randomUUID } from 'node:crypto';
 
-import { LocalAudioCaptureController } from '../audio/audioCapture.js';
 import { SessionLogger } from './logger.js';
 import { TranscriptStore } from '../storage/transcriptStore.js';
 import { BrowserTeamsJoinController, JoinFlowSnapshot } from '../teams/teamsJoinFlow.js';
 import { createMeetingTarget } from '../teams/joinUrl.js';
-import { MeetingSession, JoinFlowOptions, MeetingTarget } from '../types/index.js';
-import { PlaceholderWhisperBackend } from '../transcription/whisperPipeline.js';
+import { AudioCaptureOptions, JoinFlowOptions, MeetingSession, MeetingTarget } from '../types/index.js';
 
 export class SessionOrchestrator {
   private readonly transcriptStore = new TranscriptStore();
-  private readonly transcriptionBackend = new PlaceholderWhisperBackend();
 
   createSession(target: MeetingTarget, runtimeOptions: JoinFlowOptions = {}): MeetingSession {
     const id = randomUUID();
@@ -30,12 +27,11 @@ export class SessionOrchestrator {
     };
   }
 
-  async bootstrap(joinUrl: string, runtimeOptions: JoinFlowOptions = {}): Promise<{ session: MeetingSession; snapshot: JoinFlowSnapshot }> {
+  async bootstrap(joinUrl: string, runtimeOptions: JoinFlowOptions = {}): Promise<{ session: MeetingSession; snapshot: JoinFlowSnapshot; logger: SessionLogger }> {
     const target = createMeetingTarget(joinUrl, 'personal');
     const session = this.createSession(target, runtimeOptions);
     const logger = new SessionLogger(session.artifacts.logFile);
     const joinController = new BrowserTeamsJoinController(runtimeOptions, logger);
-    const audioCapture = new LocalAudioCaptureController();
 
     await this.transcriptStore.initialize(session);
     await logger.log('session.initialized', { sessionId: session.id, joinUrl: target.joinUrl });
@@ -47,9 +43,15 @@ export class SessionOrchestrator {
       await joinController.join();
     }
 
-    await audioCapture.start(session.id);
-    void this.transcriptionBackend;
+    return { session, snapshot, logger };
+  }
 
-    return { session, snapshot };
+  async createOfflineSession(runtimeOptions: JoinFlowOptions = {}): Promise<{ session: MeetingSession; logger: SessionLogger }> {
+    const target = createMeetingTarget('https://teams.microsoft.com/l/meetup-join/offline-prototype', 'personal');
+    const session = this.createSession(target, runtimeOptions);
+    const logger = new SessionLogger(session.artifacts.logFile);
+    await this.transcriptStore.initialize(session);
+    await logger.log('session.offline_initialized', { sessionId: session.id });
+    return { session, logger };
   }
 }

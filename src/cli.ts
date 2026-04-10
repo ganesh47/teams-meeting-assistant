@@ -1,38 +1,57 @@
 #!/usr/bin/env node
-import { createRuntimeOptionsFromEnv } from './config.js';
+import { createAudioOptionsFromEnv, createRuntimeOptionsFromEnv } from './config.js';
+import { runLocalTranscriptionPipeline } from './core/pipelineRunner.js';
 import { SessionOrchestrator } from './index.js';
+import { FasterWhisperBackend } from './transcription/fasterWhisperRunner.js';
+import { MockTranscriptionBackend } from './transcription/mockTranscriptionBackend.js';
 
 async function main() {
-  const joinUrl = process.argv[2];
+  const args = process.argv.slice(2);
+  const command = args[0];
 
-  if (!joinUrl) {
-    console.error('Usage: teams-meeting-assistant <teams-join-url> [--headless] [--auto-join]');
+  if (!command) {
+    console.error('Usage: teams-meeting-assistant <join|offline-pipeline> ...');
     process.exit(1);
   }
 
-  const envOptions = createRuntimeOptionsFromEnv();
-  const runtimeOptions = {
-    ...envOptions,
-    headless: process.argv.includes('--headless') ? true : envOptions.headless,
-    autoJoin: process.argv.includes('--auto-join') ? true : envOptions.autoJoin,
-  };
-
   const orchestrator = new SessionOrchestrator();
-  const { session, snapshot } = await orchestrator.bootstrap(joinUrl, runtimeOptions);
 
-  console.log(
-    JSON.stringify(
-      {
-        sessionId: session.id,
-        state: snapshot.state,
-        detail: snapshot.detail,
-        artifacts: session.artifacts,
-        runtime: session.runtime,
-      },
-      null,
-      2,
-    ),
-  );
+  if (command === 'join') {
+    const joinUrl = args[1];
+    if (!joinUrl) {
+      console.error('Usage: teams-meeting-assistant join <teams-join-url> [--headless] [--auto-join]');
+      process.exit(1);
+    }
+
+    const envOptions = createRuntimeOptionsFromEnv();
+    const runtimeOptions = {
+      ...envOptions,
+      headless: args.includes('--headless') ? true : envOptions.headless,
+      autoJoin: args.includes('--auto-join') ? true : envOptions.autoJoin,
+    };
+
+    const { session, snapshot } = await orchestrator.bootstrap(joinUrl, runtimeOptions);
+    console.log(JSON.stringify({ sessionId: session.id, state: snapshot.state, detail: snapshot.detail, artifacts: session.artifacts, runtime: session.runtime }, null, 2));
+    return;
+  }
+
+  if (command === 'offline-pipeline') {
+    const backendName = args[1] ?? 'mock';
+    const runtimeOptions = createRuntimeOptionsFromEnv();
+    const audioOptions = createAudioOptionsFromEnv();
+    const { session } = await orchestrator.createOfflineSession(runtimeOptions);
+
+    const backend = backendName === 'faster-whisper'
+      ? new FasterWhisperBackend({ model: process.env.TEAMS_WHISPER_MODEL || 'base' })
+      : new MockTranscriptionBackend();
+
+    const result = await runLocalTranscriptionPipeline(session, backend, audioOptions);
+    console.log(JSON.stringify({ sessionId: session.id, backend: backend.name, result, artifacts: session.artifacts }, null, 2));
+    return;
+  }
+
+  console.error(`Unknown command: ${command}`);
+  process.exit(1);
 }
 
 main().catch((error) => {
