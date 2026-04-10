@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
 import { LocalAudioCaptureController } from '../audio/audioCapture.js';
+import { SessionLogger } from './logger.js';
 import { TranscriptStore } from '../storage/transcriptStore.js';
 import { BrowserTeamsJoinController, JoinFlowSnapshot } from '../teams/teamsJoinFlow.js';
 import { createMeetingTarget } from '../teams/joinUrl.js';
@@ -32,11 +33,20 @@ export class SessionOrchestrator {
   async bootstrap(joinUrl: string, runtimeOptions: JoinFlowOptions = {}): Promise<{ session: MeetingSession; snapshot: JoinFlowSnapshot }> {
     const target = createMeetingTarget(joinUrl, 'personal');
     const session = this.createSession(target, runtimeOptions);
-    const joinController = new BrowserTeamsJoinController(runtimeOptions);
+    const logger = new SessionLogger(session.artifacts.logFile);
+    const joinController = new BrowserTeamsJoinController(runtimeOptions, logger);
     const audioCapture = new LocalAudioCaptureController();
 
     await this.transcriptStore.initialize(session);
+    await logger.log('session.initialized', { sessionId: session.id, joinUrl: target.joinUrl });
+
     const snapshot = await joinController.launch(target);
+
+    if (runtimeOptions.autoJoin) {
+      await logger.log('session.auto_join_requested');
+      await joinController.join();
+    }
+
     await audioCapture.start(session.id);
     void this.transcriptionBackend;
 

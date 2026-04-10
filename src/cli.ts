@@ -1,24 +1,24 @@
 #!/usr/bin/env node
+import { createRuntimeOptionsFromEnv } from './config.js';
 import { SessionOrchestrator } from './index.js';
 
 async function main() {
   const joinUrl = process.argv[2];
 
   if (!joinUrl) {
-    console.error('Usage: teams-meeting-assistant <teams-join-url>');
+    console.error('Usage: teams-meeting-assistant <teams-join-url> [--headless] [--auto-join]');
     process.exit(1);
   }
 
+  const envOptions = createRuntimeOptionsFromEnv();
+  const runtimeOptions = {
+    ...envOptions,
+    headless: process.argv.includes('--headless') ? true : envOptions.headless,
+    autoJoin: process.argv.includes('--auto-join') ? true : envOptions.autoJoin,
+  };
+
   const orchestrator = new SessionOrchestrator();
-  const headless = process.argv.includes('--headless');
-  const { session, snapshot } = await orchestrator.bootstrap(joinUrl, {
-    headless,
-    profileDir: '.profiles/teams-personal',
-    prejoin: {
-      muteMicrophone: true,
-      disableCamera: true,
-    },
-  });
+  const { session, snapshot } = await orchestrator.bootstrap(joinUrl, runtimeOptions);
 
   console.log(
     JSON.stringify(

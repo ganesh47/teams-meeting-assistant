@@ -2,8 +2,11 @@ import path from 'node:path';
 
 import { chromium, BrowserContext, Page } from 'playwright';
 
+import { SessionLogger } from '../core/logger.js';
 import { JoinFlowOptions, MeetingTarget, SessionState } from '../types/index.js';
+import { clickIfVisible, fillIfVisible, setPressedState } from './domActions.js';
 import { detectMeetingState } from './meetingStateDetector.js';
+import { TEAMS_SELECTORS } from './selectors.js';
 
 export interface JoinFlowSnapshot {
   state: SessionState;
@@ -22,11 +25,18 @@ const DEFAULT_PROFILE_DIR = '.profiles/teams-personal';
 export class BrowserTeamsJoinController implements TeamsJoinController {
   private context?: BrowserContext;
   private page?: Page;
+  private logger?: SessionLogger;
 
-  constructor(private readonly options: JoinFlowOptions = {}) {}
+  constructor(
+    private readonly options: JoinFlowOptions = {},
+    logger?: SessionLogger,
+  ) {
+    this.logger = logger;
+  }
 
   async launch(target: MeetingTarget): Promise<JoinFlowSnapshot> {
     const userDataDir = path.resolve(this.options.profileDir ?? DEFAULT_PROFILE_DIR);
+    await this.logger?.log('launch.begin', { joinUrl: target.joinUrl, userDataDir });
 
     this.context = await chromium.launchPersistentContext(userDataDir, {
       headless: this.options.headless ?? true,
@@ -41,7 +51,15 @@ export class BrowserTeamsJoinController implements TeamsJoinController {
     await this.page.goto(target.joinUrl, { waitUntil: 'domcontentloaded' });
     await this.page.waitForTimeout(1500);
 
-    return this.detectState();
+    const openedInBrowser = await clickIfVisible(this.page, TEAMS_SELECTORS.continueInBrowserButtons);
+    if (openedInBrowser) {
+      await this.logger?.log('launch.continue_in_browser_clicked');
+      await this.page.waitForTimeout(2000);
+    }
+
+    const snapshot = await this.detectState();
+    await this.logger?.log('launch.detected_state', snapshot);
+    return snapshot;
   }
 
   async detectState(): Promise<JoinFlowSnapshot> {
@@ -52,7 +70,9 @@ export class BrowserTeamsJoinController implements TeamsJoinController {
       };
     }
 
-    return detectMeetingState(this.page);
+    const snapshot = await detectMeetingState(this.page);
+    await this.logger?.log('state.detected', snapshot);
+    return snapshot;
   }
 
   async join(): Promise<JoinFlowSnapshot> {
@@ -65,30 +85,35 @@ export class BrowserTeamsJoinController implements TeamsJoinController {
 
     await this.applyPrejoinPreferences();
 
-    const joinNowButton = this.page.getByRole('button', { name: /join now/i }).first();
-    const continueInBrowserButton = this.page.getByRole('button', { name: /continue on this browser/i }).first();
-
-    if (await continueInBrowserButton.isVisible().catch(() => false)) {
-      await continueInBrowserButton.click();
-      await this.page.waitForTimeout(1500);
+    if (this.options.displayName) {
+      const filledName = await fillIfVisible(this.page, TEAMS_SELECTORS.nameInput, this.options.displayName);
+      if (filledName) {
+        await this.logger?.log('join.display_name_filled', { displayName: this.options.displayName });
+      }
     }
 
-    if (await joinNowButton.isVisible().catch(() => false)) {
-      await joinNowButton.click();
-      await this.page.waitForTimeout(2000);
-      return this.detectState();
+    const joined = await clickIfVisible(this.page, TEAMS_SELECTORS.joinNowButtons);
+    await this.page.waitForTimeout(2000);
+
+    if (joined) {
+      const snapshot = await this.detectState();
+      await this.logger?.log('join.clicked_join_now', snapshot);
+      return snapshot;
     }
 
+    const snapshot = await this.detectState();
     return {
-      state: 'prejoin',
-      detail: 'Join action did not find a clickable Join now button yet.',
+      state: snapshot.state,
+      detail: `Join action did not find a clickable Join now button yet. Last state: ${snapshot.state}`,
     };
   }
 
   async shutdown(): Promise<void> {
+    await this.logger?.log('shutdown.begin');
     await this.context?.close();
     this.context = undefined;
     this.page = undefined;
+    await this.logger?.log('shutdown.complete');
   }
 
   private async applyPrejoinPreferences(): Promise<void> {
@@ -98,23 +123,13 @@ export class BrowserTeamsJoinController implements TeamsJoinController {
     const disableCamera = this.options.prejoin?.disableCamera ?? true;
 
     if (muteMicrophone) {
-      const micButton = this.page.getByRole('button', { name: /microphone/i }).first();
-      if (await micButton.isVisible().catch(() => false)) {
-        const pressed = await micButton.getAttribute('aria-pressed').catch(() => null);
-        if (pressed === 'true') {
-          await micButton.click().catch(() => undefined);
-        }
-      }
+      const updated = await setPressedState(this.page, TEAMS_SELECTORS.micButtons, false);
+      await this.logger?.log('prejoin.microphone_preference', { muteMicrophone, updated });
     }
 
     if (disableCamera) {
-      const cameraButton = this.page.getByRole('button', { name: /camera/i }).first();
-      if (await cameraButton.isVisible().catch(() => false)) {
-        const pressed = await cameraButton.getAttribute('aria-pressed').catch(() => null);
-        if (pressed === 'true') {
-          await cameraButton.click().catch(() => undefined);
-        }
-      }
+      const updated = await setPressedState(this.page, TEAMS_SELECTORS.cameraButtons, false);
+      await this.logger?.log('prejoin.camera_preference', { disableCamera, updated });
     }
   }
 }

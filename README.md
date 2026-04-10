@@ -64,7 +64,9 @@ npm install
 npx playwright install chromium
 npm run build
 npm test
-node dist/cli.js "https://teams.microsoft.com/l/meetup-join/..." --headless
+TEAMS_HEADLESS=1 node dist/cli.js "https://teams.microsoft.com/l/meetup-join/..." --auto-join
 ```
+
+Environment controls are documented in `.env.example`.
 
 See `docs/m1-prototype.md` for the current browser-automation prototype notes.
