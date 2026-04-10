@@ -4,11 +4,22 @@
   "private": false,
   "description": "Microsoft Teams meeting assistant with local-only transcription.",
   "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "lint": "echo 'No code lint configured yet'",
-    "test": "echo 'No tests configured yet'"
+    "build": "tsc -p tsconfig.json",
+    "lint": "npm run build",
+    "test": "node --test tests/*.test.mjs"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.0",
+    "typescript": "^5.9.3"
   }
 }

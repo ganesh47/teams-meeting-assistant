@@ -23,7 +23,13 @@ A meeting assistant focused on Microsoft Teams meetings, with local-only transcr
 
 ## Status
 
-Early planning and repository bootstrap.
+Planning complete, repository scaffolded, and initial TypeScript implementation skeleton added for:
+
+- session orchestration
+- Teams join flow abstraction
+- local audio capture abstraction
+- Whisper transcription backend abstraction
+- transcript storage
 
 ## Initial Roadmap
 
@@ -42,4 +48,18 @@ Early planning and repository bootstrap.
 
 ## Development
 
-This repo starts with planning, docs, issue tracking, and CI scaffolding.
+Current project baseline includes:
+
+- TypeScript build setup
+- GitHub Actions for CI, build, security checks, CodeQL, release prep, and label sync
+- issue templates and PR template
+- architecture and ADR docs
+- implementation skeleton for core modules
+
+### Quick start
+
+```bash
+npm install
+npm run build
+npm test
+```
