@@ -30,6 +30,7 @@ Planning complete, repository scaffolded, and initial TypeScript implementation 
 - Teams join flow abstraction
 - local audio capture abstraction
 - Whisper transcription backend abstraction
+- first-pass faster-whisper integration path for local transcription
 - transcript storage
 
 ## Initial Roadmap
@@ -69,4 +70,6 @@ TEAMS_HEADLESS=1 node dist/cli.js "https://teams.microsoft.com/l/meetup-join/...
 
 Environment controls are documented in `.env.example`.
 
-See `docs/m1-prototype.md` for the current browser-automation prototype notes.
+Additional notes:
+- `docs/m1-prototype.md` covers the current browser-automation prototype
+- `docs/transcription-backends.md` covers the local transcription backend direction
