@@ -36,11 +36,11 @@ export class SessionOrchestrator {
     await this.transcriptStore.initialize(session);
     await logger.log('session.initialized', { sessionId: session.id, joinUrl: target.joinUrl });
 
-    const snapshot = await joinController.launch(target);
+    let snapshot = await joinController.launch(target);
 
     if (runtimeOptions.autoJoin) {
       await logger.log('session.auto_join_requested');
-      await joinController.join();
+      snapshot = await joinController.join();
     }
 
     return { session, snapshot, logger };

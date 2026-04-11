@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { writeFile } from 'node:fs/promises';
 
 import { chromium, BrowserContext, Page } from 'playwright';
 
@@ -49,12 +50,14 @@ export class BrowserTeamsJoinController implements TeamsJoinController {
 
     this.page = this.context.pages()[0] ?? (await this.context.newPage());
     await this.page.goto(target.joinUrl, { waitUntil: 'domcontentloaded' });
-    await this.page.waitForTimeout(1500);
+    await this.page.waitForTimeout(7000);
+    await this.captureDebugArtifacts('after-goto');
 
     const openedInBrowser = await clickIfVisible(this.page, TEAMS_SELECTORS.continueInBrowserButtons);
     if (openedInBrowser) {
       await this.logger?.log('launch.continue_in_browser_clicked');
-      await this.page.waitForTimeout(2000);
+      await this.page.waitForTimeout(5000);
+      await this.captureDebugArtifacts('after-continue-browser');
     }
 
     const snapshot = await this.detectState();
@@ -92,8 +95,10 @@ export class BrowserTeamsJoinController implements TeamsJoinController {
       }
     }
 
+    await this.captureDebugArtifacts('before-join-click');
     const joined = await clickIfVisible(this.page, TEAMS_SELECTORS.joinNowButtons);
-    await this.page.waitForTimeout(2000);
+    await this.page.waitForTimeout(6000);
+    await this.captureDebugArtifacts('after-join-click');
 
     if (joined) {
       const snapshot = await this.detectState();
@@ -131,5 +136,25 @@ export class BrowserTeamsJoinController implements TeamsJoinController {
       const updated = await setPressedState(this.page, TEAMS_SELECTORS.cameraButtons, false);
       await this.logger?.log('prejoin.camera_preference', { disableCamera, updated });
     }
+  }
+
+  private async captureDebugArtifacts(label: string): Promise<void> {
+    if (!this.page || !this.options.profileDir) return;
+
+    const debugDir = path.resolve(this.options.profileDir, 'debug-artifacts');
+    await writeFile(path.join(debugDir, '.keep'), '', { flag: 'a' }).catch(async () => {
+      await import('node:fs/promises').then(({ mkdir }) => mkdir(debugDir, { recursive: true }));
+    });
+
+    const safeLabel = label.replace(/[^a-z0-9-_]/gi, '_');
+    const url = this.page.url();
+    const html = await this.page.content().catch(() => '');
+    const bodyText = await this.page.locator('body').innerText().catch(() => '');
+
+    await writeFile(path.join(debugDir, `${safeLabel}.url.txt`), url, 'utf8');
+    await writeFile(path.join(debugDir, `${safeLabel}.body.txt`), bodyText, 'utf8');
+    await writeFile(path.join(debugDir, `${safeLabel}.html`), html, 'utf8');
+    await this.page.screenshot({ path: path.join(debugDir, `${safeLabel}.png`), fullPage: true }).catch(() => undefined);
+    await this.logger?.log('debug.artifacts_captured', { label, url, debugDir });
   }
 }

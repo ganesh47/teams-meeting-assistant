@@ -42,10 +42,22 @@ const MATCHERS: Matcher[] = [
 ];
 
 export async function extractPageText(page: Page): Promise<string> {
-  return page.locator('body').innerText().catch(() => '');
+  const bodyText = await page.locator('body').innerText().catch(() => '');
+  if (bodyText.trim()) {
+    return bodyText;
+  }
+
+  const html = await page.content().catch(() => '');
+  return html;
 }
 
-export function classifyMeetingState(bodyText: string): DetectionResult {
+export function classifyMeetingState(bodyText: string, url?: string): DetectionResult {
+  if (url?.includes('teams.live.com/v2/#/meet/')) {
+    return {
+      state: 'prejoin',
+      detail: 'Detected Teams live meeting route, likely prejoin shell waiting for app hydration.',
+    };
+  }
   for (const matcher of MATCHERS) {
     if (matcher.patterns.some((pattern) => pattern.test(bodyText))) {
       return {
@@ -63,5 +75,5 @@ export function classifyMeetingState(bodyText: string): DetectionResult {
 
 export async function detectMeetingState(page: Page): Promise<DetectionResult> {
   const bodyText = await extractPageText(page);
-  return classifyMeetingState(bodyText);
+  return classifyMeetingState(bodyText, page.url());
 }
