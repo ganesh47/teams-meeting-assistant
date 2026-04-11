@@ -80,6 +80,15 @@ That opens the lightweight TUI menu.
 TEAMS_HEADLESS=1 teams-meeting-assistant linux-cli "https://teams.microsoft.com/l/meetup-join/..."
 ```
 
+The JSON output now includes a clearer `status.checkpoints` list such as:
+- `launch_ok`
+- `redirect_ok`
+- `prejoin_detected`
+- `join_attempted`
+- `join_confirmed`
+- `in_meeting`
+- `transcription_active`
+
 ### Offline transcript pipeline demo
 
 ```bash

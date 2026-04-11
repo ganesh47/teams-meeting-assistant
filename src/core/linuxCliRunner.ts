@@ -1,4 +1,5 @@
 import { createAudioOptionsFromEnv, createRuntimeOptionsFromEnv } from '../config.js';
+import { buildJoinStatusReport } from './statusReporter.js';
 import { runLocalTranscriptionPipeline } from './pipelineRunner.js';
 import { SessionOrchestrator } from './sessionOrchestrator.js';
 import { FasterWhisperBackend } from '../transcription/fasterWhisperRunner.js';
@@ -28,9 +29,19 @@ export async function runLinuxCliJoinAndTranscript(joinUrl: string, options: { u
     transcriptText: session.artifacts.transcriptText,
   });
 
+  const status = buildJoinStatusReport({
+    launched: true,
+    redirected: snapshot.detail.toLowerCase().includes('prejoin') || snapshot.detail.toLowerCase().includes('teams live meeting route'),
+    joinAttempted: true,
+    finalState: snapshot.state,
+    transcriptionActive: result.segmentsWritten > 0,
+    detail: snapshot.detail,
+  });
+
   return {
     session,
     snapshot,
     result,
+    status,
   };
 }

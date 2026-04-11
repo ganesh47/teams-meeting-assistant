@@ -60,6 +60,7 @@ async function main() {
     console.log(JSON.stringify({
       sessionId: output.session.id,
       state: output.snapshot.state,
+      status: output.status,
       transcriptText: output.session.artifacts.transcriptText,
       chunksProcessed: output.result.chunksProcessed,
       segmentsWritten: output.result.segmentsWritten,
