@@ -1,6 +1,6 @@
 {
   "name": "teams-meeting-assistant",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": false,
   "description": "Microsoft Teams meeting assistant with local-only transcription.",
   "license": "MIT",
