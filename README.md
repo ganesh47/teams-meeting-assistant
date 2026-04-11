@@ -63,13 +63,13 @@ Current project baseline includes:
 ### One-liner install on Ubuntu/Debian VM
 
 ```bash
-sudo apt update && sudo apt install -y git curl ca-certificates python3 python3-pip sox pulseaudio-utils ffmpeg && curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - && sudo apt install -y nodejs && git clone https://github.com/ganesh47/teams-meeting-assistant.git && cd teams-meeting-assistant && npm ci && npx playwright install --with-deps chromium && pip3 install faster-whisper && npm run build
+sudo apt update && sudo apt install -y git curl ca-certificates python3 python3-pip sox pulseaudio-utils ffmpeg && curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - && sudo apt install -y nodejs && npx playwright install --with-deps chromium && pip3 install faster-whisper && npm install -g github:ganesh47/teams-meeting-assistant
 ```
 
 ### Slicker terminal UX
 
 ```bash
-node dist/cli.js
+teams-meeting-assistant
 ```
 
 That opens the lightweight TUI menu.
@@ -100,6 +100,12 @@ Apply update:
 
 ```bash
 teams-meeting-assistant update --apply
+```
+
+Install source:
+
+```bash
+npm install -g github:ganesh47/teams-meeting-assistant
 ```
 
 Additional notes:

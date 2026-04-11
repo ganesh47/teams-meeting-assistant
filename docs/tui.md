@@ -5,7 +5,7 @@ The project now includes a simple terminal menu interface.
 ## Run
 
 ```bash
-teams-meeting-assistant tui
+teams-meeting-assistant
 ```
 
 ## What it does
