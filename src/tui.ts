@@ -12,7 +12,8 @@ export async function runTui(): Promise<void> {
     output.write('2) Run offline transcript pipeline demo\n');
     output.write('3) Check for updates\n');
     output.write('4) Show install one-liner\n');
-    output.write('5) Exit\n\n');
+    output.write('5) Show install-ci command\n');
+    output.write('6) Exit\n\n');
 
     const choice = await rl.question('Choose an option: ');
 
@@ -36,6 +37,10 @@ export async function runTui(): Promise<void> {
       case '4': {
         output.write('\nInstall one-liner:\n');
         output.write('sudo apt update && sudo apt install -y git curl ca-certificates python3 python3-pip sox pulseaudio-utils ffmpeg && curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - && sudo apt install -y nodejs && git clone https://github.com/ganesh47/teams-meeting-assistant.git && cd teams-meeting-assistant && npm ci && npx playwright install --with-deps chromium && pip3 install faster-whisper && npm run build\n\n');
+        break;
+      }
+      case '5': {
+        output.write('\nRun:\nteams-meeting-assistant install-ci\n\n');
         break;
       }
       default:

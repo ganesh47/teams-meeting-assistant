@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { createAudioOptionsFromEnv, createRuntimeOptionsFromEnv } from './config.js';
-import { runLinuxCliJoinAndTranscript, runLocalTranscriptionPipeline, checkForUpdates, performUpdate } from './index.js';
+import { runLinuxCliJoinAndTranscript, runLocalTranscriptionPipeline, checkForUpdates, performInstallCi, performUpdate } from './index.js';
 import { SessionOrchestrator } from './index.js';
 import { runTui } from './tui.js';
 import { FasterWhisperBackend } from './transcription/fasterWhisperRunner.js';
@@ -17,12 +17,18 @@ async function main() {
 
   const orchestrator = new SessionOrchestrator();
 
-  if (command === 'update') {
+  if (command === 'install-ci') {
+    const result = await performInstallCi();
+    console.log(JSON.stringify({ ok: true, installed: true, command: result.command }, null, 2));
+    return;
+  }
+
+  if (command === 'upgrade' || command === 'update') {
     const shouldApply = args.includes('--apply');
     const status = await checkForUpdates();
 
     if (!status.latestVersion) {
-      console.log(JSON.stringify({ ok: false, message: 'Could not determine latest version from npm.' }, null, 2));
+      console.log(JSON.stringify({ ok: false, message: 'Could not determine latest version from GitHub tags.' }, null, 2));
       return;
     }
 

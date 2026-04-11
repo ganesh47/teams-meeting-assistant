@@ -54,6 +54,12 @@ export async function performUpdate(installTarget = GITHUB_INSTALL_TARGET): Prom
   return { command };
 }
 
+export async function performInstallCi(installTarget = GITHUB_INSTALL_TARGET): Promise<{ command: string }> {
+  const command = `npm install -g ${installTarget}`;
+  await execFileAsync('bash', ['-lc', command]);
+  return { command };
+}
+
 function compareSemverLike(a: string, b: string): number {
   const parse = (value: string) => value.replace(/^v/, '').split('.').map((part) => Number.parseInt(part, 10) || 0);
   const pa = parse(a);

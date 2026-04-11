@@ -105,10 +105,22 @@ Environment controls are documented in `.env.example`.
 teams-meeting-assistant update
 ```
 
+Upgrade alias:
+
+```bash
+teams-meeting-assistant upgrade
+```
+
 Apply update:
 
 ```bash
 teams-meeting-assistant update --apply
+```
+
+Install/refresh from GitHub source:
+
+```bash
+teams-meeting-assistant install-ci
 ```
 
 Install source:

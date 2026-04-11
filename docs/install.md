@@ -23,3 +23,15 @@ TEAMS_HEADLESS=1 teams-meeting-assistant linux-cli "<teams-link>"
 ```bash
 teams-meeting-assistant update
 ```
+
+## Upgrade alias
+
+```bash
+teams-meeting-assistant upgrade
+```
+
+## Reinstall from GitHub source
+
+```bash
+teams-meeting-assistant install-ci
+```

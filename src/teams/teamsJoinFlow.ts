@@ -101,7 +101,15 @@ export class BrowserTeamsJoinController implements TeamsJoinController {
     await this.captureDebugArtifacts('after-join-click');
 
     if (joined) {
-      const snapshot = await this.detectState();
+      let snapshot = await this.detectState();
+      for (let i = 0; i < 4; i += 1) {
+        if (snapshot.state === 'lobby' || snapshot.state === 'in_meeting') {
+          break;
+        }
+        await this.page.waitForTimeout(3000);
+        await this.captureDebugArtifacts(`post-join-poll-${i + 1}`);
+        snapshot = await this.detectState();
+      }
       await this.logger?.log('join.clicked_join_now', snapshot);
       return snapshot;
     }
